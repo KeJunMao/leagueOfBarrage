@@ -1,0 +1,230 @@
+{
+	"textures": [
+		{
+			"image": "main.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 360,
+				"h": 60
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "boom3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 62,
+						"h": 58
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 62,
+						"h": 58
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 62,
+						"h": 58
+					}
+				},
+				{
+					"filename": "blueWeapon0.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 8,
+						"y": 20,
+						"w": 53,
+						"h": 24
+					},
+					"frame": {
+						"x": 65,
+						"y": 1,
+						"w": 53,
+						"h": 24
+					}
+				},
+				{
+					"filename": "redWeapon0.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 8,
+						"y": 20,
+						"w": 53,
+						"h": 24
+					},
+					"frame": {
+						"x": 120,
+						"y": 1,
+						"w": 53,
+						"h": 24
+					}
+				},
+				{
+					"filename": "blueTank1.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 4,
+						"w": 45,
+						"h": 56
+					},
+					"frame": {
+						"x": 175,
+						"y": 1,
+						"w": 45,
+						"h": 56
+					}
+				},
+				{
+					"filename": "boom2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 32,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 32,
+						"h": 32
+					},
+					"frame": {
+						"x": 65,
+						"y": 27,
+						"w": 32,
+						"h": 32
+					}
+				},
+				{
+					"filename": "boom1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 30,
+						"h": 28
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 30,
+						"h": 28
+					},
+					"frame": {
+						"x": 99,
+						"y": 27,
+						"w": 30,
+						"h": 28
+					}
+				},
+				{
+					"filename": "boom0.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 22,
+						"h": 22
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 22,
+						"h": 22
+					},
+					"frame": {
+						"x": 131,
+						"y": 27,
+						"w": 22,
+						"h": 22
+					}
+				},
+				{
+					"filename": "redTank1.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 4,
+						"w": 45,
+						"h": 56
+					},
+					"frame": {
+						"x": 222,
+						"y": 1,
+						"w": 45,
+						"h": 56
+					}
+				},
+				{
+					"filename": "blueTank0.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 4,
+						"w": 44,
+						"h": 56
+					},
+					"frame": {
+						"x": 269,
+						"y": 1,
+						"w": 44,
+						"h": 56
+					}
+				},
+				{
+					"filename": "redTank0.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 64
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 4,
+						"w": 44,
+						"h": 56
+					},
+					"frame": {
+						"x": 315,
+						"y": 1,
+						"w": 44,
+						"h": 56
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:1017cd63083e795d4b0cc898ae09dfc5:74501e3553a362aeee98150c5c69c2b2:03f91ab73e0f4667800419161e658c40$"
+	}
+}
