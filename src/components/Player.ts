@@ -3,32 +3,35 @@ import { Flag } from "./Flag";
 import Team from "../enums/Team";
 import Bullet from "./Bullet";
 import LeagueOfBarrage from "./LeagueOfBarrage";
-import ImageCircle from "./ImageCircle";
 import Anims from "../enums/Anims";
 import HpBar from "./HpBar";
 import { User } from "./User";
 import Bubble from "./Bubble";
+import CircleMaskImage from "phaser3-rex-plugins/plugins/circlemaskimage";
 
 export default class Player extends Phaser.GameObjects.Container {
   mid: number;
   weapon!: Phaser.GameObjects.Sprite;
   tank!: Phaser.GameObjects.Sprite;
   target: Flag;
-  speed: number = 10;
   team: Team;
   bullets: Phaser.GameObjects.Group;
+  speed: number = 100;
   maxHp: number = 3;
   hp: number = this.maxHp;
   lastFired: number;
   power: number = 0.5;
-  face!: ImageCircle;
+  face!: CircleMaskImage;
   fireDelay: number;
   hpBar: HpBar;
   ammo: number = 10;
+  area: number = 30;
   user: User;
   bubble!: Bubble;
+  tween!: Phaser.Tweens.Tween;
   constructor(scene: Phaser.Scene, x: number, y: number, user: User) {
     super(scene, x, y);
+
     this.scene = scene;
     const { mid, team } = user;
     this.user = user;
@@ -68,20 +71,11 @@ export default class Player extends Phaser.GameObjects.Container {
 
     this.add([this.tank, this.weapon]);
     this.setSize(tankWidth, tankHeight);
-    this.bubble = new Bubble(this.scene);
-
     this.scene.physics.world.enable(this);
 
-    this.scene.tweens.add({
-      targets: this.weapon,
-      angle: {
-        from: this.team === Team.Red ? -30 : 210,
-        to: this.team === Team.Red ? 30 : 150,
-        yoyo: -1,
-      },
-      duration: 2000,
-      loop: -1,
-    });
+    this.bubble = new Bubble(this.scene);
+
+    this.makeTween();
 
     if (team === Team.Red) {
       this.scene.physics.add.overlap(
@@ -103,6 +97,25 @@ export default class Player extends Phaser.GameObjects.Container {
     this.add(this.hpBar);
 
     this.loadFace();
+  }
+
+  makeTween() {
+    const tweenConfig = {
+      targets: this.weapon,
+      props: {
+        angle: {
+          from: this.team === Team.Red ? 0 - this.area : 180 + this.area,
+          to: this.team === Team.Red ? 0 + this.area : 180 - this.area,
+          yoyo: -1,
+        },
+      },
+      duration: 2000,
+      loop: -1,
+    };
+    if (this.tween) {
+      this.tween.remove();
+    }
+    this.tween = this.scene.tweens.add(tweenConfig);
   }
 
   onBulletOverlapsPlayer(bullet: Bullet, player: Player) {
@@ -131,13 +144,13 @@ export default class Player extends Phaser.GameObjects.Container {
     const key = `${this.mid}-face`;
     this.scene.load.image(key, face);
     this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
-      this.face = new ImageCircle(
+      this.face = new CircleMaskImage(
         this.scene,
         this.team === Team.Red ? -4 : 4,
         0,
         key
       );
-      this.face.image.setDisplaySize(16, 16);
+      this.face.setDisplaySize(16, 16);
       this.scene.add.existing(this.face);
       this.add(this.face);
     });
@@ -161,7 +174,8 @@ export default class Player extends Phaser.GameObjects.Container {
           } else {
             LeagueOfBarrage.Core.bluePlayerGroup.remove(this);
           }
-          // this.scene.children.remove(this);
+          // 重生
+          LeagueOfBarrage.Core.makePlayer(this.user);
         });
     }
   }
@@ -175,12 +189,9 @@ export default class Player extends Phaser.GameObjects.Container {
       this.setDie();
       return;
     }
-    if (this.face) {
-      this.face.updateMaskTransform();
-    }
-    if (this.x > 0 && this.x < scene.renderer.width) {
+    if (this.x > 0 && time > this.lastFired) {
       const bullet: Bullet = this.bullets.get();
-      if (bullet && time > this.lastFired) {
+      if (bullet) {
         bullet.fire(this, this.x, this.y);
         this.lastFired = time + this.fireDelay;
       }
