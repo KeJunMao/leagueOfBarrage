@@ -42,7 +42,7 @@ export default class Core {
     });
     this.live.on("DANMU_MSG", this.onDanmuMsg.bind(this));
     this.live.on("SEND_GIFT", this.onSendGift.bind(this));
-    this.makeFakeLive();
+    // this.makeFakeLive();
   }
 
   makeFakeLive() {
