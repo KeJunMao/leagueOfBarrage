@@ -101,8 +101,8 @@ export default class PowerUp {
       player.power += this.Power;
       player.fireDelay -= this.FireDelay;
       // 限制射速
-      if (player.fireDelay < 200) {
-        player.fireDelay = 200;
+      if (player.fireDelay < 100) {
+        player.fireDelay = 100;
       }
       player.speed += this.Speed;
 
@@ -158,6 +158,8 @@ export default class PowerUp {
 const laTiaoGift = (num: number = 1) => {
   return new PowerUp({
     text: `辣条低级强化*${num}`,
+    hp: 5,
+    maxHp: 5,
     power: 0.1,
     life: 1,
     num,
@@ -167,8 +169,8 @@ const laTiaoGift = (num: number = 1) => {
 const heartGift = (num: number = 1) => {
   return new PowerUp({
     text: `小心心中级强化*${num}`,
-    hp: 1,
-    maxHp: 2,
+    hp: 10,
+    maxHp: 15,
     ammo: 1,
     life: 1,
     num,
@@ -181,8 +183,8 @@ const flowerGift = (num: number = 1) => {
     text: `小花花高级强化*${num}`,
     fireDelay: 5,
     speed: 0.1,
-    hp: 1,
-    maxHp: 1 / 5,
+    hp: 15,
+    maxHp: 20,
     ammo: 1,
     area: 0.1 / 5,
     life: 1,
@@ -198,8 +200,8 @@ const callGift = (num: number = 1) => {
     power: 0.1,
     fireDelay: 10,
     speed: 0.3,
-    hp: 1,
-    maxHp: 1,
+    hp: 20,
+    maxHp: 25,
     ammo: 1,
     area: 0.1,
     life: 1,
