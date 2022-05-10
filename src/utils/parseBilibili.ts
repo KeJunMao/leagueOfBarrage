@@ -12,11 +12,12 @@ export interface IParseGiftData {
   name: string;
   num: number;
   mid: number;
+  uname: string;
 }
 
 export function parseANMU_MSG(data: IDanMu_MSGData) {
   const { info } = data;
-  console.log(info);
+  // console.log(info);
   const text: string = info[1];
   const user = info[2];
   const mid: number = user[0];
@@ -26,13 +27,14 @@ export function parseANMU_MSG(data: IDanMu_MSGData) {
 
 export function parseSEND_GIFT(data: ISendGiftData) {
   const { data: gift } = data;
-  console.log(gift);
-  const { giftId, giftName, num, uid } = gift;
+  // console.log(gift);
+  const { giftId, giftName, num, uid, uname } = gift;
   const result: IParseGiftData = {
     id: giftId,
     name: giftName,
     num,
     mid: uid,
+    uname,
   };
   return result;
   // const test = {

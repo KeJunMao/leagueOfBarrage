@@ -1,50 +1,226 @@
-import Player from "./Player";
+import LeagueOfBarrage from "./LeagueOfBarrage";
+// import Player from "./Player";
+import { User } from "./User";
 
+interface IPowerUpProps {
+  power?: number;
+  fireDelay?: number;
+  speed?: number;
+  hp?: number;
+  maxHp?: number;
+  ammo?: number;
+  area?: number;
+  life?: number;
+  text?: string;
+  bulletSpeed?: number;
+  num?: number;
+  rotateDuration?: number;
+}
 export default class PowerUp {
   public power = 0;
   public fireDelay = 0;
   public speed = 0;
   public hp = 0;
-  public maxhp = 0;
+  public maxHp = 0;
   public ammo = 0;
   public area = 0;
-  constructor({ power, fireDelay, speed, hp, maxHp, ammo, area }: any) {
-    this.power = power;
-    this.fireDelay = fireDelay;
-    this.speed = speed;
-    this.hp = hp;
-    this.maxhp = maxHp;
-    this.ammo = ammo;
-    this.area = area;
+  public life = 0;
+  public text = "";
+  public bulletSpeed = 0;
+  public num = 1;
+  public rotateDuration = 0;
+  constructor({
+    power,
+    fireDelay,
+    speed,
+    hp,
+    maxHp,
+    ammo,
+    area,
+    life,
+    text,
+    bulletSpeed,
+    num,
+    rotateDuration,
+  }: IPowerUpProps) {
+    this.power = power ?? 0;
+    this.fireDelay = fireDelay ?? 0;
+    this.speed = speed ?? 0;
+    this.hp = hp ?? 0;
+    this.maxHp = maxHp ?? 0;
+    this.ammo = ammo ?? 0;
+    this.area = area ?? 0;
+    this.text = text ?? "";
+    this.bulletSpeed = bulletSpeed ?? 0;
+    this.num = num ?? 1;
+    this.life = life ?? 0;
+    this.rotateDuration = rotateDuration ?? 0;
   }
 
-  applyUp(player: Player) {
-    player.power += this.power;
-    player.fireDelay -= this.fireDelay;
-    player.speed += this.speed;
-    player.hp += this.hp;
+  valueByNum(val: number) {
+    return val * this.num;
+  }
 
-    const hp = player.maxHp;
-    player.maxHp += this.maxhp;
-    player.hp += this.maxhp - hp;
+  get Power() {
+    return this.valueByNum(this.power);
+  }
 
-    player.ammo += this.ammo;
+  get Speed() {
+    return this.valueByNum(this.speed);
+  }
 
-    player.bullets.maxSize = player.ammo;
+  get FireDelay() {
+    return this.valueByNum(this.fireDelay);
+  }
 
-    player.area += this.area;
-    player.makeTween();
+  get Hp() {
+    return this.valueByNum(this.hp);
+  }
+  get MaxHp() {
+    return this.valueByNum(this.maxHp);
+  }
+
+  get BulletSpeed() {
+    return this.valueByNum(this.bulletSpeed);
+  }
+  get Ammo() {
+    return this.valueByNum(this.ammo);
+  }
+  get Area() {
+    return this.valueByNum(this.area);
+  }
+
+  get RotateDuration() {
+    return this.valueByNum(this.rotateDuration);
+  }
+
+  applyUp(user: User) {
+    const player = user.player;
+
+    if (player) {
+      player.power += this.Power;
+      player.fireDelay -= this.FireDelay;
+      // 限制射速
+      if (player.fireDelay < 200) {
+        player.fireDelay = 200;
+      }
+      player.speed += this.Speed;
+
+      player.bulletSpeed += this.BulletSpeed;
+
+      player.hp += this.Hp;
+      player.maxHp += this.MaxHp;
+
+      if (player.hp > player.maxHp) {
+        player.hp = player.maxHp;
+      }
+
+      player.ammo += this.Ammo;
+      // 限制弹药库
+      if (player.ammo > 50) {
+        player.ammo = 50;
+      }
+      player.bullets.maxSize = player.ammo;
+
+      if (this.Area || this.RotateDuration) {
+        player.area += this.Area;
+
+        player.rotateDuration -= this.RotateDuration;
+        // 限制选择速率最小200
+        if (player.rotateDuration < 200) {
+          player.rotateDuration = 200;
+        }
+        player.makeTween();
+      }
+
+      if (this.life > 0) {
+        user.life += this.life;
+        this.life -= 1;
+      }
+    } else {
+      if (this.life > 0) {
+        user.life += this.life;
+        this.life -= 1;
+        if (user.life > 0 && !user.player) {
+          console.log("礼物复活");
+          LeagueOfBarrage.Core.makePlayer(user);
+          this.applyUp(user);
+        }
+      } else {
+        console.log(user.life);
+        console.log("阵亡无法强化");
+      }
+    }
   }
 }
 
-// 辣条
-const laTiaoGift = () => {
-  return new PowerUp({});
+// 辣条 提升攻击力
+const laTiaoGift = (num: number = 1) => {
+  return new PowerUp({
+    text: `辣条低级强化*${num}`,
+    power: 0.1,
+    life: 1,
+    num,
+  });
+};
+// 小心心 提升血上限
+const heartGift = (num: number = 1) => {
+  return new PowerUp({
+    text: `小心心中级强化*${num}`,
+    hp: 1,
+    maxHp: 2,
+    ammo: 1,
+    life: 1,
+    num,
+  });
 };
 
+// 小花花 小幅提升射速、移动速度、角度、子弹速度
+const flowerGift = (num: number = 1) => {
+  return new PowerUp({
+    text: `小花花高级强化*${num}`,
+    fireDelay: 5,
+    speed: 0.1,
+    hp: 1,
+    maxHp: 1 / 5,
+    ammo: 1,
+    area: 0.1 / 5,
+    life: 1,
+    bulletSpeed: 0.1 / 5,
+    num,
+  });
+};
+
+// 打 call 属性大幅提升
+const callGift = (num: number = 1) => {
+  return new PowerUp({
+    text: `打call超级强化*${num}`,
+    power: 0.1,
+    fireDelay: 10,
+    speed: 0.3,
+    hp: 1,
+    maxHp: 1,
+    ammo: 1,
+    area: 0.1,
+    life: 1,
+    bulletSpeed: 0.1,
+    num,
+  });
+};
+
+// const random = (min: number, max: number) => {
+//   return Math.random() * (max - min) + min;
+// };
+
 export const gifts: {
-  [key: number]: PowerUp;
+  [key: number | string]: (num?: number) => PowerUp;
 } = {
   // 辣条
-  1: laTiaoGift(),
+  1: laTiaoGift,
+  // da call
+  31037: callGift,
+  // 小花花
+  31036: flowerGift,
+  // 小心心
+  30607: heartGift,
 };

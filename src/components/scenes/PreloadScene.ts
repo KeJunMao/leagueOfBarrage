@@ -13,6 +13,7 @@ export default class PreloadScene extends Scene {
     this.load.image("bullet", "/bullet.png");
     this.load.image("tiles", "/muddy-ground.png");
     this.load.multiatlas("main", "/sprite/main.json", "/sprite");
+    this.load.audio("bg-music", "/bg.mp3");
   }
 
   create() {

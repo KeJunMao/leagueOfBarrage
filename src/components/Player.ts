@@ -16,16 +16,18 @@ export default class Player extends Phaser.GameObjects.Container {
   target: Flag;
   team: Team;
   bullets: Phaser.GameObjects.Group;
-  speed: number = 100;
+  bulletSpeed: number = 5;
+  speed: number = 10;
   maxHp: number = 3;
   hp: number = this.maxHp;
-  lastFired: number;
   power: number = 0.5;
-  face!: CircleMaskImage;
-  fireDelay: number;
-  hpBar: HpBar;
-  ammo: number = 10;
+  fireDelay: number = 1000;
+  rotateDuration = 2000;
+  ammo: number = 50;
   area: number = 30;
+  lastFired: number;
+  face!: CircleMaskImage;
+  hpBar: HpBar;
   user: User;
   bubble!: Bubble;
   tween!: Phaser.Tweens.Tween;
@@ -36,6 +38,8 @@ export default class Player extends Phaser.GameObjects.Container {
     const { mid, team } = user;
     this.user = user;
     this.user.player = this;
+    this.user.life -= 1;
+
     this.mid = mid;
     this.team = team;
     this.target =
@@ -44,7 +48,6 @@ export default class Player extends Phaser.GameObjects.Container {
         : LeagueOfBarrage.Core.redFlag;
     this.scene.add.existing(this);
     this.lastFired = 0;
-    this.fireDelay = 1000;
 
     this.bullets = this.scene.add.group({
       classType: Bullet,
@@ -95,8 +98,12 @@ export default class Player extends Phaser.GameObjects.Container {
 
     this.hpBar = new HpBar(this.scene, this);
     this.add(this.hpBar);
-
+    // apply powerUp
+    this.user.powerUps.forEach((powerUp) => {
+      powerUp.applyUp(this.user);
+    });
     this.loadFace();
+    // this.add(this.scene.add.text(0, 0, `${this.user.name}-${this.user.life}`));
   }
 
   makeTween() {
@@ -109,7 +116,7 @@ export default class Player extends Phaser.GameObjects.Container {
           yoyo: -1,
         },
       },
-      duration: 2000,
+      duration: this.rotateDuration,
       loop: -1,
     };
     if (this.tween) {
@@ -120,9 +127,11 @@ export default class Player extends Phaser.GameObjects.Container {
 
   onBulletOverlapsPlayer(bullet: Bullet, player: Player) {
     bullet.setDie();
-    player.hp = player.hp - this.power;
-    if (player.isDie) {
-      this.user.killCount += 1;
+    if (player.x > 16 && player.x < this.scene.renderer.width - 16) {
+      player.hp = player.hp - this.power;
+      if (player.isDie) {
+        this.user.killCount += 1;
+      }
     }
   }
 
@@ -138,30 +147,42 @@ export default class Player extends Phaser.GameObjects.Container {
 
   async loadFace() {
     if (!this.scene) return;
-    const url = `/api/face/${this.mid}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    const { face } = data;
-    this.user.faceUrl = face;
     const key = `${this.mid}-face`;
-    this.scene.load.image(key, face);
-    this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
-      this.face = new CircleMaskImage(
-        this.scene,
-        this.team === Team.Red ? -4 : 4,
-        0,
-        key
-      );
-      this.face.setDisplaySize(16, 16);
-      this.scene.add.existing(this.face);
-      this.add(this.face);
-    });
-    this.scene.load.start();
+    // 已经载入
+    if (this.user.faceUrl) {
+      this.makeFace(key);
+    } else {
+      const url = `/api/face/${this.mid}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const faceUrl = data.face;
+      if (faceUrl) {
+        this.scene.load.image(key, faceUrl);
+        this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
+          this.user.faceUrl = faceUrl;
+          this.makeFace.call(this, key);
+        });
+        this.scene.load.start();
+      }
+    }
+  }
+
+  makeFace(key: string) {
+    this.face = new CircleMaskImage(
+      this.scene,
+      this.team === Team.Red ? -4 : 4,
+      0,
+      key
+    );
+    this.face.setDisplaySize(16, 16);
+    this.scene.add.existing(this.face);
+    this.add(this.face);
   }
 
   setDie() {
     this.hpBar.setDie();
     this.setActive(false);
+    this.user.player = undefined;
     if (this.visible) {
       this.tank.setOrigin(0.5);
       this.tank.setPosition(0, 0);
@@ -177,7 +198,10 @@ export default class Player extends Phaser.GameObjects.Container {
             LeagueOfBarrage.Core.bluePlayerGroup.remove(this);
           }
           // 重生
-          LeagueOfBarrage.Core.makePlayer(this.user);
+
+          if (this.user.life > 0) {
+            LeagueOfBarrage.Core.makePlayer(this.user);
+          }
         });
     }
   }
@@ -194,9 +218,14 @@ export default class Player extends Phaser.GameObjects.Container {
       this.setDie();
       return;
     }
-    if (this.x > 0 && time > this.lastFired) {
+    if (
+      this.x > 0 &&
+      this.x < this.scene.renderer.width &&
+      time > this.lastFired
+    ) {
       const bullet: Bullet = this.bullets.get();
       if (bullet) {
+        bullet.speed = this.bulletSpeed;
         bullet.fire(this, this.x, this.y);
         this.lastFired = time + this.fireDelay;
       }
