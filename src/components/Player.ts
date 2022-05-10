@@ -137,10 +137,12 @@ export default class Player extends Phaser.GameObjects.Container {
   }
 
   async loadFace() {
+    if (!this.scene) return;
     const url = `/api/face/${this.mid}`;
     const response = await fetch(url);
     const data = await response.json();
     const { face } = data;
+    this.user.faceUrl = face;
     const key = `${this.mid}-face`;
     this.scene.load.image(key, face);
     this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
@@ -184,6 +186,9 @@ export default class Player extends Phaser.GameObjects.Container {
     this.hpBar.update();
     this.bubble.setPosition(this.x - 10, this.y - 45);
     const scene = this.scene as MainScene;
+    if (LeagueOfBarrage.Core.isGameStart !== -1) {
+      return;
+    }
     scene.physics.moveTo(this, this.target.x, this.target.y, this.speed);
     if (this.isDie) {
       this.setDie();

@@ -21,7 +21,7 @@ export default class ScoreScene extends Phaser.Scene {
         this.renderer.width / 2,
         this.renderer.height / 2,
         this.renderer.width,
-        this.renderer.height - 20,
+        this.renderer.height - 80,
         {
           orientation: "y",
         }

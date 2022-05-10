@@ -7,13 +7,15 @@ export default class PowerUp {
   public hp = 0;
   public maxhp = 0;
   public ammo = 0;
-  constructor({ power, fireDelay, speed, hp, maxHp, ammo }: any) {
+  public area = 0;
+  constructor({ power, fireDelay, speed, hp, maxHp, ammo, area }: any) {
     this.power = power;
     this.fireDelay = fireDelay;
     this.speed = speed;
     this.hp = hp;
     this.maxhp = maxHp;
     this.ammo = ammo;
+    this.area = area;
   }
 
   applyUp(player: Player) {
@@ -29,12 +31,20 @@ export default class PowerUp {
     player.ammo += this.ammo;
 
     player.bullets.maxSize = player.ammo;
+
+    player.area += this.area;
+    player.makeTween();
   }
 }
+
+// 辣条
+const laTiaoGift = () => {
+  return new PowerUp({});
+};
 
 export const gifts: {
   [key: number]: PowerUp;
 } = {
   // 辣条
-  1: new PowerUp({}),
+  1: laTiaoGift(),
 };

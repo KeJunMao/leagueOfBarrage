@@ -16,6 +16,7 @@ export interface IParseGiftData {
 
 export function parseANMU_MSG(data: IDanMu_MSGData) {
   const { info } = data;
+  console.log(info);
   const text: string = info[1];
   const user = info[2];
   const mid: number = user[0];
@@ -25,6 +26,7 @@ export function parseANMU_MSG(data: IDanMu_MSGData) {
 
 export function parseSEND_GIFT(data: ISendGiftData) {
   const { data: gift } = data;
+  console.log(gift);
   const { giftId, giftName, num, uid } = gift;
   const result: IParseGiftData = {
     id: giftId,

@@ -17,11 +17,11 @@ export default class ScoreBar extends Phaser.GameObjects.Container {
         y: 10,
         width: this.scene.renderer.width - 20,
 
-        background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, COLOR_DARK),
+        // background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, COLOR_DARK),
 
         slider: {
-          track: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, COLOR_LIGHT),
-          indicator: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, COLOR_DARK),
+          track: this.rexUI.add.roundRectangle(0, 0, 0, 5, 0, COLOR_LIGHT),
+          indicator: this.rexUI.add.roundRectangle(0, 0, 0, 5, 0, COLOR_DARK),
           input: "click",
         },
 

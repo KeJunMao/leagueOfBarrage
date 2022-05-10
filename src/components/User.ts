@@ -5,7 +5,11 @@ import Player from "./Player";
 export class User {
   player!: Player;
   killCount: number = 0;
-  constructor(public mid: number, public team: Team, public name: string) {}
+  faceUrl: string = "";
+  constructor(public mid: number, public team: Team, public name: string) {
+    const teamString = team === Team.Red ? "红队" : "蓝队";
+    LeagueOfBarrage.Core.toast.showMessage(`${name} 加入了 ${teamString}`);
+  }
 
   speak(text: string) {
     this.player?.speak(text);

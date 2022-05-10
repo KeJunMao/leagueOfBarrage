@@ -11,6 +11,7 @@ export default class LeagueOfBarrage extends Game {
     super({
       type: Phaser.AUTO,
       backgroundColor: "#000",
+      parent: "game",
       scale: {
         width: 800,
         height: 400,
@@ -30,7 +31,7 @@ export default class LeagueOfBarrage extends Game {
       physics: {
         default: "arcade",
         arcade: {
-          // debug: true,
+          debug: true,
         },
       },
     });

@@ -1,4 +1,5 @@
 import { LiveWS } from "bilibili-live-ws/src/browser";
+import Toast from "phaser3-rex-plugins/templates/ui/toast/Toast";
 import Team from "../enums/Team";
 import { parseANMU_MSG, parseSEND_GIFT } from "../utils/parseBilibili";
 import AnimsManger from "./anims";
@@ -23,8 +24,10 @@ export default class Core {
   sceneManager!: SceneManager;
   testTimer: any;
   isGameOver = false;
+  isGameStart = 5;
   users: User[] = [];
   public winTeam: Team | null = null;
+  toast!: Toast;
 
   constructor(game: LeagueOfBarrage, scene: Phaser.Scene) {
     this.game = game;
@@ -47,11 +50,19 @@ export default class Core {
     this.redPlayerGroup.clear();
     this.bluePlayerGroup.clear();
     this.users = [];
+    this.isGameOver = false;
+    this.isGameStart = 5;
   }
 
   initGame(scene: Phaser.Scene) {
     this.scene = scene;
-    this.isGameOver = false;
+    this.toast = this.scene.rexUI.add.toast({
+      x: this.scene.renderer.width / 2,
+      y: this.scene.renderer.height - 12,
+      text: this.scene.add.text(0, 0, "", {
+        fontSize: "12px",
+      }),
+    });
     this.animsManger = new AnimsManger(this.scene);
     this.redPlayerGroup = this.scene.add.group({
       runChildUpdate: true,
@@ -126,16 +137,10 @@ export default class Core {
     if (this.isGameOver) return;
     const gift = parseSEND_GIFT(data);
     const user = User.getUserByMid(gift.mid);
-    // 如果用户已经死亡，直接复活
     if (user) {
-      if (user.player.isDie) {
-        this.makePlayer(user);
-      } else {
-        const powerUp = gifts[gift.id];
-        if (powerUp) {
-          powerUp.applyUp(user.player);
-        }
-        // up power!
+      const powerUp = gifts[gift.id];
+      if (powerUp) {
+        powerUp.applyUp(user.player);
       }
     }
     // 如果用户已经存在，则强化
@@ -178,11 +183,12 @@ export default class Core {
   }
 
   makePlayer(user: User) {
-    const xOffset = 50;
+    const xOffset = -50;
+    const yOffset = 30;
     const player = new Player(
       this.scene,
       xOffset,
-      Math.random() * this.scene.renderer.height,
+      Math.random() * (this.scene.renderer.height - yOffset * 2) + yOffset,
       user
     );
     if (user.team === Team.Red) {
