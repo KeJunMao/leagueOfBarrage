@@ -1,7 +1,7 @@
 import { LiveWS } from "bilibili-live-ws/src/browser";
 import Toast from "phaser3-rex-plugins/templates/ui/toast/Toast";
 import Team from "../enums/Team";
-import { parseANMU_MSG, parseSEND_GIFT } from "../utils/parseBilibili";
+import { parseDANMU_MSG, parseSEND_GIFT } from "../utils/parseBilibili";
 import AnimsManger from "./anims";
 import { BlueFlag, Flag, RedFlag } from "./Flag";
 import LeagueOfBarrage from "./LeagueOfBarrage";
@@ -10,6 +10,9 @@ import PowerUp, { gifts } from "./PowerUp";
 import SceneManager from "./SceneManger";
 import ScoreBar from "./ScoreBar";
 import { User } from "./User";
+import throttle from "lodash.throttle";
+import { store } from "../store";
+import { addUser, clearUser } from "../store/usersSlice";
 
 export default class Core {
   game: LeagueOfBarrage;
@@ -25,10 +28,11 @@ export default class Core {
   testTimer: any;
   isGameOver = false;
   isGameStart = 5;
-  users: User[] = [];
+  // users: User[] = [];
   public winTeam: Team | null = null;
   toast!: Toast;
   sound!: Phaser.Sound.BaseSound;
+  store = store;
 
   constructor(game: LeagueOfBarrage, scene: Phaser.Scene) {
     this.game = game;
@@ -59,7 +63,8 @@ export default class Core {
     clearInterval(this.testTimer);
     this.redPlayerGroup.clear();
     this.bluePlayerGroup.clear();
-    this.users = [];
+    // this.users = [];
+    this.store.dispatch(clearUser());
     this.isGameOver = false;
     this.isGameStart = 5;
   }
@@ -94,23 +99,6 @@ export default class Core {
     // this.makeMap();
     this.makeFlag();
 
-    /// @ts-ignore
-    window.debug = () => {
-      this.users.push(new User(37728693, Team.Red, "玩家1"));
-      this.users.push(new User(2122373318, Team.Blue, "玩家2"));
-      this.users.push(new User(37728693, Team.Red, "玩家3"));
-      this.users.push(new User(2122373318, Team.Blue, "玩家4"));
-      this.users.push(new User(37728693, Team.Red, "玩家5"));
-      this.users.push(new User(2122373318, Team.Blue, "玩家6"));
-      this.users.push(new User(2122373318, Team.Blue, "玩家7"));
-      this.users.forEach((user) => {
-        user.killCount = Math.floor(Math.random() * 10) + 1;
-        this.makePlayer(user);
-      });
-    };
-    /// @ts-ignore
-    // window.debug();
-
     this.scene.physics.add.collider(
       this.redPlayerGroup,
       this.bluePlayerGroup,
@@ -137,13 +125,14 @@ export default class Core {
 
   onDanmuMsg(data: any) {
     if (this.isGameOver) return;
-    const danmu = parseANMU_MSG(data);
+    const danmu = parseDANMU_MSG(data);
     const hasUser = User.getUserByMid(danmu.mid);
     if (!hasUser) {
       if (danmu.text === "蓝" || danmu.text === "红") {
         const team = danmu.text === "红" ? Team.Red : Team.Blue;
         const user = new User(danmu.mid, team, danmu.name);
-        this.users.push(user);
+        // this.users.push(user);
+        this.store.dispatch(addUser(user));
         this.makePlayer(user);
       } else {
         const user = this.makeRandomUser(danmu.mid, danmu.name);
@@ -152,13 +141,13 @@ export default class Core {
     } else {
       hasUser?.speak(danmu.text);
       // 金手指
-      // this.makeGift(hasUser, danmu.text);
+      this.makeGift(hasUser, danmu.text);
     }
   }
 
   makeGift(user: User, cmd: string) {
     if (cmd.startsWith(":")) {
-      let [giftIdStr, numStr] = cmd.split(":")[1].split("*");
+      let [giftIdStr, numStr] = cmd.split(":")[1].split("-");
       const giftId = parseInt(giftIdStr);
       const num = parseInt(numStr) > 100 ? 100 : parseInt(numStr);
       if ([1, 31037, 31036, 30607].includes(giftId)) {
@@ -187,7 +176,8 @@ export default class Core {
       team = Team.Blue;
     }
     const user = new User(mid, team, name);
-    this.users.push(user);
+    // this.users.push(user);
+    this.store.dispatch(addUser(user));
     return user;
   }
 
@@ -197,7 +187,10 @@ export default class Core {
     // console.log(gift);
     let user = User.getUserByMid(gift.mid);
     const powerUpFunc = gifts[gift.id];
-    let powerUp: PowerUp | undefined = undefined;
+    // 不存在的礼物直接提供命数
+    let powerUp: PowerUp = new PowerUp({
+      life: gift.num,
+    });
     if (powerUpFunc) {
       powerUp = powerUpFunc(gift.num);
     }
@@ -207,9 +200,9 @@ export default class Core {
       this.makePlayer(user);
     }
     // 如果有强化项目，应用
-    if (powerUp) {
-      user.powerUps.push(powerUp);
-      powerUp.applyUp(user);
+    user.powerUps.push(powerUp);
+    powerUp.applyUp(user);
+    if (powerUp.text) {
       user.speak(powerUp.text);
       this.toast.showMessage(`${user.name}使用了${powerUp.text}`);
     }
@@ -251,7 +244,7 @@ export default class Core {
   }
 
   makePlayer(user: User) {
-    const xOffset = -50;
+    const xOffset = 50;
     const yOffset = 30;
     const player = new Player(
       this.scene,
@@ -282,7 +275,24 @@ export default class Core {
     );
   }
 
-  update() {
+  private _makeNpc() {
+    const { users } = this.store.getState();
+    if (users.value.length < 6 && this.isGameStart === -1) {
+      const npc = this.makeRandomUser(0, "NPC");
+      npc.powerUps.push(
+        new PowerUp({
+          power: -0.2,
+          maxHp: -1,
+        })
+      );
+      this.makePlayer(npc);
+    }
+  }
+
+  makeNpc = throttle(this._makeNpc, 1000);
+
+  update(_time: number = 0) {
+    this.makeNpc();
     this.scoreBar.update();
   }
 }

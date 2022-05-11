@@ -8,6 +8,8 @@ import HpBar from "./HpBar";
 import { User } from "./User";
 import Bubble from "./Bubble";
 import CircleMaskImage from "phaser3-rex-plugins/plugins/circlemaskimage";
+import PowerUp from "./PowerUp";
+import { updateUser } from "../store/usersSlice";
 
 export default class Player extends Phaser.GameObjects.Container {
   mid: number;
@@ -16,14 +18,14 @@ export default class Player extends Phaser.GameObjects.Container {
   target: Flag;
   team: Team;
   bullets: Phaser.GameObjects.Group;
-  bulletSpeed: number = 5;
+  bulletSpeed: number = 10;
   speed: number = 10;
   maxHp: number = 3;
   hp: number = this.maxHp;
   power: number = 0.5;
   fireDelay: number = 1000;
   rotateDuration = 2000;
-  ammo: number = 50;
+  ammo: number = 10;
   area: number = 30;
   lastFired: number;
   face!: CircleMaskImage;
@@ -31,6 +33,8 @@ export default class Player extends Phaser.GameObjects.Container {
   user: User;
   bubble!: Bubble;
   tween!: Phaser.Tweens.Tween;
+  level = 1;
+  levelText!: Phaser.GameObjects.Text;
   constructor(scene: Phaser.Scene, x: number, y: number, user: User) {
     super(scene, x, y);
 
@@ -39,6 +43,7 @@ export default class Player extends Phaser.GameObjects.Container {
     this.user = user;
     this.user.player = this;
     this.user.life -= 1;
+    LeagueOfBarrage.Core.store.dispatch(updateUser());
 
     this.mid = mid;
     this.team = team;
@@ -76,7 +81,7 @@ export default class Player extends Phaser.GameObjects.Container {
     this.setSize(tankWidth, tankHeight);
     this.scene.physics.world.enable(this);
 
-    this.bubble = new Bubble(this.scene);
+    this.bubble = new Bubble(this.scene).setDepth(10000);
 
     this.makeTween();
 
@@ -100,10 +105,20 @@ export default class Player extends Phaser.GameObjects.Container {
     this.add(this.hpBar);
     // apply powerUp
     this.user.powerUps.forEach((powerUp) => {
-      powerUp.applyUp(this.user);
+      powerUp.applyUp(this.user as User);
     });
     this.loadFace();
-    // this.add(this.scene.add.text(0, 0, `${this.user.name}-${this.user.life}`));
+    this.levelText = this.scene.add
+      .text(
+        this.team === Team.Blue ? -4 : -10,
+        -tankHeight / 2 - 4,
+        `lv${this.level}`,
+        {
+          fontSize: "8px",
+        }
+      )
+      .setOrigin(0);
+    this.add(this.levelText);
   }
 
   makeTween() {
@@ -129,8 +144,10 @@ export default class Player extends Phaser.GameObjects.Container {
     bullet.setDie();
     if (player.x > 16 && player.x < this.scene.renderer.width - 16) {
       player.hp = player.hp - this.power;
-      if (player.isDie) {
+      if (player.isDie && this.user) {
         this.user.killCount += 1;
+        this.user.xp += player.level * 2 || 2;
+        LeagueOfBarrage.Core.store.dispatch(updateUser());
       }
     }
   }
@@ -151,7 +168,8 @@ export default class Player extends Phaser.GameObjects.Container {
     // 已经载入
     if (this.user.faceUrl) {
       this.makeFace(key);
-    } else {
+    } else if (this.mid > 0) {
+      // 非NPC
       const url = `/api/face/${this.mid}`;
       const response = await fetch(url);
       const data = await response.json();
@@ -206,6 +224,30 @@ export default class Player extends Phaser.GameObjects.Container {
     }
   }
 
+  levelUp() {
+    this.level++;
+    const powerUp = new PowerUp({
+      hp: this.maxHp,
+      maxHp: 1 * this.level,
+      fireDelay: 1.004,
+      power: 0.1 * this.level,
+      num: 1,
+    });
+    this.levelText.setText(`lv${this.level}`);
+    powerUp.applyUp(this.user as User);
+    this.user.powerUps.push(powerUp);
+  }
+
+  checkForLevelUp() {
+    let factor = 5 + 1.5 * Math.floor(this.level / 20);
+    factor = Math.min(factor, 5);
+    const requiredToLevelUp = factor * this.level * this.level;
+    // console.log(this.user?.xp > 0);
+    if (requiredToLevelUp < this.user?.xp) {
+      this.levelUp();
+    }
+  }
+
   update(time: number, _delta: number): void {
     this.hpBar.update();
     this.bubble.setPosition(this.x - 10, this.y - 45);
@@ -214,6 +256,7 @@ export default class Player extends Phaser.GameObjects.Container {
       return;
     }
     scene.physics.moveTo(this, this.target.x, this.target.y, this.speed);
+    this.checkForLevelUp();
     if (this.isDie) {
       this.setDie();
       return;

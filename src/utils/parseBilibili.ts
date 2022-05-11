@@ -15,7 +15,7 @@ export interface IParseGiftData {
   uname: string;
 }
 
-export function parseANMU_MSG(data: IDanMu_MSGData) {
+export function parseDANMU_MSG(data: IDanMu_MSGData) {
   const { info } = data;
   // console.log(info);
   const text: string = info[1];

@@ -7,11 +7,14 @@ export class User {
   player: Player | undefined;
   killCount: number = 0;
   faceUrl: string = "";
-  life: number = 2;
+  life: number = 3;
   powerUps: PowerUp[] = [];
+  xp: number = 0;
   constructor(public mid: number, public team: Team, public name: string) {
     const teamString = team === Team.Red ? "红队" : "蓝队";
-    LeagueOfBarrage.Core.toast.showMessage(`${name} 加入了 ${teamString}`);
+    if (mid > 0) {
+      LeagueOfBarrage.Core.toast.showMessage(`${name} 加入了 ${teamString}`);
+    }
   }
 
   speak(text: string) {
@@ -19,6 +22,8 @@ export class User {
   }
 
   static getUserByMid(mid: number): User | undefined {
-    return LeagueOfBarrage.Core.users.find((user) => user.mid === mid);
+    const { users } = LeagueOfBarrage.Core.store.getState();
+    // return LeagueOfBarrage.Core.store
+    return users.value.find((user) => user.mid === mid);
   }
 }

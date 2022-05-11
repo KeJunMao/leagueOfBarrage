@@ -42,6 +42,6 @@ export default class MainScene extends Scene {
         this.counter.setVisible(false);
       }
     }
-    LeagueOfBarrage.Core.update();
+    LeagueOfBarrage.Core.update(time);
   }
 }

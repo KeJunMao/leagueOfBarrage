@@ -1,4 +1,6 @@
+import { updateUser } from "../store/usersSlice";
 import LeagueOfBarrage from "./LeagueOfBarrage";
+import Player from "./Player";
 // import Player from "./Player";
 import { User } from "./User";
 
@@ -94,16 +96,24 @@ export default class PowerUp {
     return this.valueByNum(this.rotateDuration);
   }
 
+  applyFireDelay(player: Player) {
+    for (let i = 0; i < this.num; i++) {
+      const factor = Math.max(this.fireDelay ** player.fireDelay / 1, 1);
+      player.fireDelay -= factor;
+    }
+  }
+
   applyUp(user: User) {
     const player = user.player;
 
     if (player) {
       player.power += this.Power;
-      player.fireDelay -= this.FireDelay;
-      // 限制射速
-      if (player.fireDelay < 100) {
-        player.fireDelay = 100;
-      }
+      this.applyFireDelay(player);
+      // player.fireDelay -= this.FireDelay;
+      // // 限制射速
+      // if (player.fireDelay < 100) {
+      //   player.fireDelay = 100;
+      // }
       player.speed += this.Speed;
 
       player.bulletSpeed += this.BulletSpeed;
@@ -135,17 +145,19 @@ export default class PowerUp {
 
       if (this.life > 0) {
         user.life += this.life;
-        this.life -= 1;
+        this.life = 0;
+        LeagueOfBarrage.Core.store.dispatch(updateUser());
       }
     } else {
       if (this.life > 0) {
         user.life += this.life;
-        this.life -= 1;
+        this.life = 0;
         if (user.life > 0 && !user.player) {
           console.log("礼物复活");
           LeagueOfBarrage.Core.makePlayer(user);
           this.applyUp(user);
         }
+        LeagueOfBarrage.Core.store.dispatch(updateUser());
       } else {
         console.log(user.life);
         console.log("阵亡无法强化");
@@ -154,40 +166,38 @@ export default class PowerUp {
   }
 }
 
-// 辣条 提升攻击力
+// 辣条 提升射速 恢复血量
 const laTiaoGift = (num: number = 1) => {
   return new PowerUp({
     text: `辣条低级强化*${num}`,
+    fireDelay: 1.005,
     hp: 5,
-    maxHp: 5,
-    power: 0.1,
-    life: 1,
+    life: num,
     num,
   });
 };
-// 小心心 提升血上限
+// 小心心 提升射速 恢复血量 提升血量上限
 const heartGift = (num: number = 1) => {
   return new PowerUp({
     text: `小心心中级强化*${num}`,
+    fireDelay: 1.0045,
     hp: 10,
-    maxHp: 15,
+    maxHp: 2,
     ammo: 1,
-    life: 1,
+    life: num,
     num,
   });
 };
 
-// 小花花 小幅提升射速、移动速度、角度、子弹速度
+// 小花花 提升射速、移动速度、角度、子弹速度
 const flowerGift = (num: number = 1) => {
   return new PowerUp({
     text: `小花花高级强化*${num}`,
-    fireDelay: 5,
-    speed: 0.1,
-    hp: 15,
-    maxHp: 20,
+    fireDelay: 1.005,
+    speed: 0.05,
     ammo: 1,
     area: 0.1 / 5,
-    life: 1,
+    life: num,
     bulletSpeed: 0.1 / 5,
     num,
   });
@@ -197,14 +207,11 @@ const flowerGift = (num: number = 1) => {
 const callGift = (num: number = 1) => {
   return new PowerUp({
     text: `打call超级强化*${num}`,
-    power: 0.1,
-    fireDelay: 10,
-    speed: 0.3,
-    hp: 20,
-    maxHp: 25,
+    fireDelay: 1.006,
+    speed: 0.1,
     ammo: 1,
-    area: 0.1,
-    life: 1,
+    area: 1,
+    life: num,
     bulletSpeed: 0.1,
     num,
   });
