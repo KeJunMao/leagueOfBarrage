@@ -141,7 +141,7 @@ export default class Core {
     } else {
       hasUser?.speak(danmu.text);
       // 金手指
-      this.makeGift(hasUser, danmu.text);
+      // this.makeGift(hasUser, danmu.text);
     }
   }
 
