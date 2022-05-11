@@ -255,7 +255,7 @@ export default class Core {
   }
 
   makePlayer(user: User) {
-    const xOffset = 50;
+    const xOffset = -50;
     const yOffset = 30;
     const player = new Player(
       this.scene,
