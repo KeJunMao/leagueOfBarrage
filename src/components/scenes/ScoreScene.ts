@@ -67,7 +67,7 @@ export default class ScoreScene extends Phaser.Scene {
         },
       });
     const { users } = LeagueOfBarrage.Core.store.getState();
-    users.value.sort((a, b) => b.killCount - a.killCount);
+    [...users.value].sort((a, b) => b.killCount - a.killCount);
     const teamUsers = users.value.filter(
       (user) => user.team === team && user.mid > 0
     );
