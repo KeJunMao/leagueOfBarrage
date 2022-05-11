@@ -178,6 +178,7 @@ export default class Player extends Phaser.GameObjects.Container {
         this.scene.load.image(key, faceUrl);
         this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
           this.user.faceUrl = faceUrl;
+          LeagueOfBarrage.Core.store.dispatch(updateUser());
           this.makeFace.call(this, key);
         });
         this.scene.load.start();
