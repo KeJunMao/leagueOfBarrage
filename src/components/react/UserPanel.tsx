@@ -13,7 +13,7 @@ const UserPanel: FC<UserPanelProps> = ({ user }) => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "5px",
+        padding: "2px",
       }}
     >
       <div
@@ -24,7 +24,7 @@ const UserPanel: FC<UserPanelProps> = ({ user }) => {
           fontSize: "12px",
           textAlign: "center",
           marginBottom: "5px",
-          height: "50px",
+          height: "25px",
         }}
       >
         {user.name}
@@ -39,6 +39,7 @@ const UserPanel: FC<UserPanelProps> = ({ user }) => {
           style={{
             width: "100%",
             height: "100%",
+            border: `1px solid ${user.team}`,
           }}
           src={user.faceUrl || "http://i0.hdslb.com/bfs/face/member/noface.jpg"}
           alt=""

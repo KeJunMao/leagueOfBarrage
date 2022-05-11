@@ -6,7 +6,7 @@ import AnimsManger from "./anims";
 import { BlueFlag, Flag, RedFlag } from "./Flag";
 import LeagueOfBarrage from "./LeagueOfBarrage";
 import Player from "./Player";
-import PowerUp, { gifts } from "./PowerUp";
+import PowerUp, { facesPowerUp, giftsPowerUp } from "./PowerUp";
 import SceneManager from "./SceneManger";
 import ScoreBar from "./ScoreBar";
 import { User } from "./User";
@@ -139,7 +139,18 @@ export default class Core {
         this.makePlayer(user);
       }
     } else {
-      hasUser?.speak(danmu.text);
+      if (danmu.faceId) {
+        const powerUpFunc = facesPowerUp[danmu.faceId];
+        if (powerUpFunc) {
+          const powerUp = powerUpFunc(hasUser);
+          powerUp.applyUpOnce(hasUser);
+          if (powerUp.text) {
+            hasUser.speak(powerUp.text);
+          }
+        }
+      } else {
+        hasUser?.speak(danmu.text);
+      }
       // 金手指
       // this.makeGift(hasUser, danmu.text);
     }
@@ -186,7 +197,7 @@ export default class Core {
     const gift = parseSEND_GIFT(data);
     // console.log(gift);
     let user = User.getUserByMid(gift.mid);
-    const powerUpFunc = gifts[gift.id];
+    const powerUpFunc = giftsPowerUp[gift.id];
     // 不存在的礼物直接提供命数
     let powerUp: PowerUp = new PowerUp({
       life: gift.num,

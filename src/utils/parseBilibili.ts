@@ -14,6 +14,12 @@ export interface IParseGiftData {
   mid: number;
   uname: string;
 }
+export interface IParseDanmuData {
+  text: string;
+  mid: number;
+  name: string;
+  faceId?: string;
+}
 
 export function parseDANMU_MSG(data: IDanMu_MSGData) {
   const { info } = data;
@@ -22,7 +28,12 @@ export function parseDANMU_MSG(data: IDanMu_MSGData) {
   const user = info[2];
   const mid: number = user[0];
   const name: string = user[1];
-  return { text, mid, name };
+  const result: IParseDanmuData = { text, mid, name };
+  try {
+    const faceId: string = info[0][13].emoticon_unique;
+    result["faceId"] = faceId;
+  } catch (error) {}
+  return result;
 }
 
 export function parseSEND_GIFT(data: ISendGiftData) {

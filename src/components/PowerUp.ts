@@ -164,6 +164,13 @@ export default class PowerUp {
       }
     }
   }
+
+  applyUpOnce(user: User) {
+    if (user.powerUps.includes(this)) {
+      user.powerUps.slice(user.powerUps.indexOf(this), 1);
+    }
+    this.applyUp(user);
+  }
 }
 
 // 辣条 提升射速 恢复血量
@@ -221,7 +228,7 @@ const callGift = (num: number = 1) => {
 //   return Math.random() * (max - min) + min;
 // };
 
-export const gifts: {
+export const giftsPowerUp: {
   [key: number | string]: (num?: number) => PowerUp;
 } = {
   // 辣条
@@ -232,4 +239,34 @@ export const gifts: {
   31036: flowerGift,
   // 小心心
   30607: heartGift,
+};
+
+export const facesPowerUp: {
+  [key: string]: (user?: User) => PowerUp;
+} = {
+  // 点赞
+  official_147: () => {
+    return new PowerUp({
+      hp: 1,
+      text: "血量恢复*1",
+    });
+  },
+  // 打call
+  official_146: (user?: User) => {
+    const rand = Math.random();
+    let powerUp = new PowerUp({});
+    if (!user) return powerUp;
+    if (rand > 0 && rand <= 0.7) {
+      // 无事发生
+      powerUp.text = "打call无事发生*1";
+    } else if (rand > 0.8 && rand <= 0.9) {
+      // 扣属性
+      powerUp.hp -= 1;
+      powerUp.text = "打call用力过猛";
+    } else {
+      powerUp = callGift();
+      powerUp.text = "伪·打call超级强化*1";
+    }
+    return powerUp;
+  },
 };

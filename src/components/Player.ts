@@ -35,6 +35,7 @@ export default class Player extends Phaser.GameObjects.Container {
   tween!: Phaser.Tweens.Tween;
   level = 1;
   levelText!: Phaser.GameObjects.Text;
+  isFullFire: boolean = false;
   constructor(scene: Phaser.Scene, x: number, y: number, user: User) {
     super(scene, x, y);
 
@@ -162,6 +163,19 @@ export default class Player extends Phaser.GameObjects.Container {
     }
   }
 
+  checkForFullFire() {
+    if (!this.isFullFire && this.hp <= 0.5) {
+      this.isFullFire = true;
+      this.fireDelay = this.fireDelay < 200 ? this.fireDelay : 200;
+      this.ammo = this.ammo > 50 ? this.ammo : 50;
+      this.bullets.maxSize = this.ammo;
+      this.rotateDuration =
+        this.rotateDuration < 200 ? this.rotateDuration : 200;
+      this.makeTween();
+      this.speak("火力全开！");
+    }
+  }
+
   async loadFace() {
     if (!this.scene) return;
     const key = `${this.mid}-face`;
@@ -200,6 +214,8 @@ export default class Player extends Phaser.GameObjects.Container {
 
   setDie() {
     this.hpBar.setDie();
+    this.remove(this.bubble);
+    this.bubble.destroy(true);
     this.setActive(false);
     this.user.player = undefined;
     if (this.visible) {
@@ -262,6 +278,7 @@ export default class Player extends Phaser.GameObjects.Container {
       this.setDie();
       return;
     }
+    this.checkForFullFire();
     if (
       this.x > 0 &&
       this.x < this.scene.renderer.width &&
