@@ -26,6 +26,9 @@ export default class Player extends Phaser.GameObjects.Container {
   fireDelay: number = 1000;
   rotateDuration = 2000;
   ammo: number = 10;
+  fullFireDelay = this.fireDelay;
+  fullFireRotateDuration = this.rotateDuration;
+  fullFireAmmo = this.ammo;
   area: number = 30;
   lastFired: number;
   face!: CircleMaskImage;
@@ -132,7 +135,7 @@ export default class Player extends Phaser.GameObjects.Container {
           yoyo: -1,
         },
       },
-      duration: this.rotateDuration,
+      duration: Math.min(this.rotateDuration, this.fullFireRotateDuration),
       loop: -1,
     };
     if (this.tween) {
@@ -164,15 +167,29 @@ export default class Player extends Phaser.GameObjects.Container {
   }
 
   checkForFullFire() {
-    if (!this.isFullFire && this.hp <= 0.5) {
+    const minFullFireDelay = 200;
+    const minFullFireAmmo = 50;
+    const minFullFireRotateDuration = 500;
+    if (this.hp <= 0.5 && !this.isFullFire) {
       this.isFullFire = true;
-      this.fireDelay = this.fireDelay < 200 ? this.fireDelay : 200;
-      this.ammo = this.ammo > 50 ? this.ammo : 50;
-      this.bullets.maxSize = this.ammo;
-      this.rotateDuration =
-        this.rotateDuration < 200 ? this.rotateDuration : 200;
+      this.fullFireDelay = Math.min(minFullFireDelay, this.fireDelay);
+      this.fullFireAmmo = Math.min(minFullFireAmmo, this.ammo);
+      this.fullFireRotateDuration = Math.min(
+        minFullFireRotateDuration,
+        this.rotateDuration
+      );
+
+      this.bullets.maxSize = this.fullFireAmmo;
       this.makeTween();
       this.speak("火力全开！");
+    } else if (this.hp > 0.5 && this.isFullFire) {
+      // 关闭火力全开
+      this.isFullFire = false;
+      this.fullFireDelay = this.fireDelay;
+      this.fullFireRotateDuration = this.rotateDuration;
+      this.fullFireAmmo = this.ammo;
+      this.bullets.maxSize = this.ammo;
+      this.makeTween();
     }
   }
 
@@ -253,6 +270,7 @@ export default class Player extends Phaser.GameObjects.Container {
     this.levelText.setText(`lv${this.level}`);
     powerUp.applyUp(this.user as User);
     this.user.powerUps.push(powerUp);
+    LeagueOfBarrage.Core.store.dispatch(updateUser());
   }
 
   checkForLevelUp() {
@@ -288,7 +306,7 @@ export default class Player extends Phaser.GameObjects.Container {
       if (bullet) {
         bullet.speed = this.bulletSpeed;
         bullet.fire(this, this.x, this.y);
-        this.lastFired = time + this.fireDelay;
+        this.lastFired = time + Math.min(this.fireDelay, this.fullFireDelay);
       }
     }
   }

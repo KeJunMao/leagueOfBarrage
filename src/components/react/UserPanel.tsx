@@ -1,3 +1,6 @@
+import { Badge, Typography, Chip } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
 import { FC } from "react";
 import { User } from "../User";
 
@@ -7,54 +10,58 @@ interface UserPanelProps {
 
 const UserPanel: FC<UserPanelProps> = ({ user }) => {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "2px",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "12px",
-          textAlign: "center",
-          marginBottom: "5px",
-          height: "25px",
-        }}
-      >
-        {user.name}
-      </div>
-      <div
-        style={{
-          width: "64px",
-          height: "64px",
+      <Typography variant="h6" gutterBottom color="gold">
+        {user.killCount}
+      </Typography>
+      <Box
+        sx={{
+          color: "white",
+          mb: 1,
         }}
       >
         <img
           style={{
-            width: "100%",
-            height: "100%",
-            border: `1px solid ${user.team}`,
+            height: "1em",
           }}
-          src={user.faceUrl || "http://i0.hdslb.com/bfs/face/member/noface.jpg"}
+          src={`/source/${user.team}Tank0.png`}
           alt=""
-        />
-      </div>
-      <div
-        style={{
-          fontSize: "25px",
-          fontWeight: "bolder",
-          color: "gold",
+        />{" "}
+        x {user.life + 1}
+      </Box>
+
+      <Box
+        sx={{
+          my: 1,
         }}
       >
-        {user.killCount}
-      </div>
-    </div>
+        <Badge badgeContent={`lv${user?.player?.level ?? 1}`}>
+          <Avatar
+            sx={{ width: 56, height: 56 }}
+            alt={user.name}
+            src={
+              user.faceUrl || "http://i0.hdslb.com/bfs/face/member/noface.jpg"
+            }
+          ></Avatar>
+        </Badge>
+      </Box>
+      <Typography
+        sx={{
+          minHeight: "3em",
+        }}
+        align="center"
+        variant="subtitle2"
+      >
+        {user.name}
+      </Typography>
+    </Box>
   );
 };
 

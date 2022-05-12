@@ -288,8 +288,35 @@ export default class Core {
 
   private _makeNpc() {
     const { users } = this.store.getState();
+    const npcList = [
+      {
+        mid: 1526202214,
+        name: "爱吃东西的7",
+      },
+      {
+        mid: 17329503,
+        name: "LxShann",
+      },
+      {
+        mid: 1643473462,
+        name: "Too-Ln",
+      },
+      {
+        mid: 77236988,
+        name: "话多起腻懂话多起腻懂",
+      },
+      {
+        mid: 2122373318,
+        name: "木杨吖",
+      },
+      {
+        mid: 37728693,
+        name: "Ke Jun",
+      },
+    ];
     if (users.value.length < 6 && this.isGameStart === -1) {
-      const npc = this.makeRandomUser(0, "NPC");
+      const npcUser = npcList[users.value.length];
+      const npc = this.makeRandomUser(npcUser.mid, npcUser.name);
       npc.powerUps.push(
         new PowerUp({
           power: -0.2,

@@ -14,7 +14,7 @@ export default class ScoreScene extends Phaser.Scene {
     this.add
       .rectangle(0, 0, this.renderer.width, this.renderer.height, 0x000000)
       .setOrigin(0)
-      .setAlpha(0.5);
+      .setAlpha(0.8);
     const title = this.makeTitle();
     const sizer = this.rexUI.add
       .sizer(

@@ -179,6 +179,7 @@ const laTiaoGift = (num: number = 1) => {
     text: `辣条低级强化*${num}`,
     fireDelay: 1.005,
     hp: 5,
+    ammo: 1,
     life: num,
     num,
   });
