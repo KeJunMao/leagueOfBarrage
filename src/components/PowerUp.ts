@@ -125,12 +125,12 @@ export default class PowerUp {
         player.hp = player.maxHp;
       }
 
-      player.ammo += this.Ammo;
-      // 限制弹药库
-      if (player.ammo > 50) {
-        player.ammo = 50;
-      }
-      player.bullets.maxSize = player.ammo;
+      // player.ammo += this.Ammo;
+      // // 限制弹药库
+      // if (player.ammo > 50) {
+      //   player.ammo = 50;
+      // }
+      // player.bullets.maxSize = player.ammo;
 
       if (this.Area || this.RotateDuration) {
         player.area += this.Area;
@@ -257,10 +257,10 @@ export const facesPowerUp: {
     const rand = Math.random();
     let powerUp = new PowerUp({});
     if (!user) return powerUp;
-    if (rand > 0 && rand <= 0.7) {
+    if (rand > 0 && rand <= 0.25) {
       // 无事发生
       powerUp.text = "打call无事发生*1";
-    } else if (rand > 0.8 && rand <= 0.9) {
+    } else if (rand > 0.25 && rand <= 0.5) {
       // 扣属性
       powerUp.hp -= 1;
       powerUp.text = "打call用力过猛";

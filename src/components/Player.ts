@@ -25,10 +25,10 @@ export default class Player extends Phaser.GameObjects.Container {
   power: number = 0.5;
   fireDelay: number = 1000;
   rotateDuration = 2000;
-  ammo: number = 10;
+  // ammo: number = 10;
   fullFireDelay = this.fireDelay;
   fullFireRotateDuration = this.rotateDuration;
-  fullFireAmmo = this.ammo;
+  // fullFireAmmo = this.ammo;
   area: number = 30;
   lastFired: number;
   face!: CircleMaskImage;
@@ -37,8 +37,10 @@ export default class Player extends Phaser.GameObjects.Container {
   bubble!: Bubble;
   tween!: Phaser.Tweens.Tween;
   level = 1;
-  levelText!: Phaser.GameObjects.Text;
+  // levelText!: Phaser.GameObjects.Text;
   isFullFire: boolean = false;
+  tankWidth = 48;
+  tankHeight = 48;
   constructor(scene: Phaser.Scene, x: number, y: number, user: User) {
     super(scene, x, y);
 
@@ -60,17 +62,20 @@ export default class Player extends Phaser.GameObjects.Container {
 
     this.bullets = this.scene.add.group({
       classType: Bullet,
-      maxSize: this.ammo,
+      // maxSize: this.ammo,
       runChildUpdate: true,
     });
 
     this.scene.anims.create({});
 
-    const tankWidth = 32;
-    const tankHeight = 32;
     this.tank = this.scene.add
-      .sprite(-tankWidth / 2, -tankHeight / 2, "main", `${this.team}Tank0.png`)
-      .setScale(0.5)
+      .sprite(
+        -this.tankWidth / 2,
+        -this.tankHeight / 2,
+        "main",
+        `${this.team}Tank0.png`
+      )
+      .setDisplaySize(this.tankWidth, this.tankHeight)
       .setOrigin(0);
     this.tank.anims.play(`${this.team}Run`);
     if (this.team === Team.Blue) {
@@ -82,7 +87,7 @@ export default class Player extends Phaser.GameObjects.Container {
       .setDisplayOrigin(16, 32);
 
     this.add([this.tank, this.weapon]);
-    this.setSize(tankWidth, tankHeight);
+    this.setSize(this.tankWidth, this.tankHeight);
     this.scene.physics.world.enable(this);
 
     this.bubble = new Bubble(this.scene).setDepth(10000);
@@ -112,17 +117,17 @@ export default class Player extends Phaser.GameObjects.Container {
       powerUp.applyUp(this.user as User);
     });
     this.loadFace();
-    this.levelText = this.scene.add
-      .text(
-        this.team === Team.Blue ? -4 : -10,
-        -tankHeight / 2 - 4,
-        `lv${this.level}`,
-        {
-          fontSize: "8px",
-        }
-      )
-      .setOrigin(0);
-    this.add(this.levelText);
+    // this.levelText = this.scene.add
+    //   .text(
+    //     this.team === Team.Blue ? -4 : -10,
+    //     -this.tankHeight / 2 - 4,
+    //     `lv${this.level}`,
+    //     {
+    //       fontSize: "8px",
+    //     }
+    //   )
+    //   .setOrigin(0);
+    // this.add(this.levelText);
   }
 
   makeTween() {
@@ -168,18 +173,18 @@ export default class Player extends Phaser.GameObjects.Container {
 
   checkForFullFire() {
     const minFullFireDelay = 200;
-    const minFullFireAmmo = 50;
+    // const minFullFireAmmo = 50;
     const minFullFireRotateDuration = 500;
     if (this.hp <= 0.5 && !this.isFullFire) {
       this.isFullFire = true;
       this.fullFireDelay = Math.min(minFullFireDelay, this.fireDelay);
-      this.fullFireAmmo = Math.max(minFullFireAmmo, this.ammo);
+      // this.fullFireAmmo = Math.max(minFullFireAmmo, this.ammo);
       this.fullFireRotateDuration = Math.min(
         minFullFireRotateDuration,
         this.rotateDuration
       );
 
-      this.bullets.maxSize = this.fullFireAmmo;
+      // this.bullets.maxSize = this.fullFireAmmo;
       this.makeTween();
       this.speak("火力全开！");
       LeagueOfBarrage.Core.store.dispatch(updateUser());
@@ -188,8 +193,8 @@ export default class Player extends Phaser.GameObjects.Container {
       this.isFullFire = false;
       this.fullFireDelay = this.fireDelay;
       this.fullFireRotateDuration = this.rotateDuration;
-      this.fullFireAmmo = this.ammo;
-      this.bullets.maxSize = this.ammo;
+      // this.fullFireAmmo = this.ammo;
+      // this.bullets.maxSize = this.ammo;
       this.makeTween();
       LeagueOfBarrage.Core.store.dispatch(updateUser());
     }
@@ -222,11 +227,11 @@ export default class Player extends Phaser.GameObjects.Container {
   makeFace(key: string) {
     this.face = new CircleMaskImage(
       this.scene,
-      this.team === Team.Red ? -4 : 4,
+      this.team === Team.Red ? -5 : 5,
       0,
       key
     );
-    this.face.setDisplaySize(16, 16);
+    this.face.setDisplaySize(this.tankWidth - 24, this.tankHeight - 24);
     this.scene.add.existing(this.face);
     this.add(this.face);
   }
@@ -270,7 +275,7 @@ export default class Player extends Phaser.GameObjects.Container {
       power: 0.1 * this.level,
       num: 1,
     });
-    this.levelText.setText(`lv${this.level}`);
+    // this.levelText.setText(`lv${this.level}`);
     powerUp.applyUp(this.user as User);
     this.user.powerUps.push(powerUp);
     LeagueOfBarrage.Core.store.dispatch(updateUser());

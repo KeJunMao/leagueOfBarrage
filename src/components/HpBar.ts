@@ -18,19 +18,19 @@ export default class HpBar extends Phaser.GameObjects.Container {
     // this.text =
     this.bar = this.rexUI.add
       .numberBar({
-        x: 400,
-        y: 300,
-        width: 23,
+        x: 0,
+        y: 0,
+        width: 32,
 
         background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 0, COLOR_DARK),
 
         slider: {
-          track: this.rexUI.add.roundRectangle(0, 0, 0, 0, 1, COLOR_PRIMARY),
-          indicator: this.rexUI.add.roundRectangle(0, 0, 0, 0, 1, COLOR_LIGHT),
+          track: this.rexUI.add.roundRectangle(0, 0, 0, 5, 0, COLOR_PRIMARY),
+          indicator: this.rexUI.add.roundRectangle(0, 0, 0, 5, 0, COLOR_LIGHT),
           input: "click",
         },
         text: this.scene.add.text(0, 0, "x2", {
-          fontSize: "8px",
+          fontSize: "10px",
         }),
         space: {},
       })
@@ -40,8 +40,11 @@ export default class HpBar extends Phaser.GameObjects.Container {
   }
   update(): void {
     this.bar.setPosition(
-      this.player.x - (this.player.team === Team.Red ? 4 : -4),
-      this.player.y + 16
+      this.player.x -
+        (this.player.team === Team.Red
+          ? this.bar.width / 4
+          : -this.bar.width / 4),
+      this.player.y + 32
     );
     const text = `x${this.player?.user?.life + 1 ?? 2}`;
     this.bar.setText(text);

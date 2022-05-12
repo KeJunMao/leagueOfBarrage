@@ -16,7 +16,7 @@ export default () => {
     {
       name: "打call表情",
       img: "http://i0.hdslb.com/bfs/live/fa1eb4dce3ad198bb8650499830560886ce1116c.png",
-      content: "10%概率获得强化，若阵亡，10%概率复活",
+      content: "50%概率获得强化，若阵亡，50%概率复活",
     },
   ];
   const gifts = [
