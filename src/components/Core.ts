@@ -1,4 +1,4 @@
-import { LiveWS } from "bilibili-live-ws/src/browser";
+import { KeepLiveWS, LiveWS } from "bilibili-live-ws/src/browser";
 import Toast from "phaser3-rex-plugins/templates/ui/toast/Toast";
 import Team from "../enums/Team";
 import { parseDANMU_MSG, parseSEND_GIFT } from "../utils/parseBilibili";
@@ -21,7 +21,7 @@ export default class Core {
   blueFlag!: Flag;
   redPlayerGroup!: Phaser.GameObjects.Group;
   bluePlayerGroup!: Phaser.GameObjects.Group;
-  live!: LiveWS;
+  live!: KeepLiveWS;
   animsManger!: AnimsManger;
   scoreBar!: ScoreBar;
   sceneManager!: SceneManager;
@@ -37,7 +37,8 @@ export default class Core {
   constructor(game: LeagueOfBarrage, scene: Phaser.Scene) {
     this.game = game;
     this.scene = scene;
-    this.live = new LiveWS(1439885);
+    // this.live = new LiveWS(1439885);
+    this.live = new KeepLiveWS(1439885);
     this.live.on("open", () => console.log("Connection is established"));
     // Connection is established
     this.live.on("live", () => {
@@ -303,7 +304,7 @@ export default class Core {
       },
       {
         mid: 77236988,
-        name: "话多起腻懂话多起腻懂",
+        name: "话多起腻懂",
       },
       {
         mid: 2122373318,

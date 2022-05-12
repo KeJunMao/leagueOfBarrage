@@ -173,7 +173,7 @@ export default class Player extends Phaser.GameObjects.Container {
     if (this.hp <= 0.5 && !this.isFullFire) {
       this.isFullFire = true;
       this.fullFireDelay = Math.min(minFullFireDelay, this.fireDelay);
-      this.fullFireAmmo = Math.min(minFullFireAmmo, this.ammo);
+      this.fullFireAmmo = Math.max(minFullFireAmmo, this.ammo);
       this.fullFireRotateDuration = Math.min(
         minFullFireRotateDuration,
         this.rotateDuration
@@ -278,7 +278,7 @@ export default class Player extends Phaser.GameObjects.Container {
     factor = Math.min(factor, 5);
     const requiredToLevelUp = factor * this.level * this.level;
     // console.log(this.user?.xp > 0);
-    if (requiredToLevelUp < this.user?.xp) {
+    if (requiredToLevelUp <= this.user?.xp) {
       this.levelUp();
     }
   }

@@ -9,12 +9,12 @@ export default () => {
   const users = useSelector((state: RootState) => state.users.value);
   const danmuGifts = [
     {
-      name: "点赞",
+      name: "点赞表情",
       img: "http://i0.hdslb.com/bfs/live/bbd9045570d0c022a984c637e406cb0e1f208aa9.png",
       content: "恢复1点血量",
     },
     {
-      name: "打call",
+      name: "打call表情",
       img: "http://i0.hdslb.com/bfs/live/fa1eb4dce3ad198bb8650499830560886ce1116c.png",
       content: "10%概率获得强化，若阵亡，10%概率复活",
     },
