@@ -29,9 +29,9 @@ export default class HpBar extends Phaser.GameObjects.Container {
           indicator: this.rexUI.add.roundRectangle(0, 0, 0, 5, 0, COLOR_LIGHT),
           input: "click",
         },
-        text: this.scene.add.text(0, 0, "x2", {
-          fontSize: "10px",
-        }),
+        // text: this.scene.add.text(0, 0, "x2", {
+        //   fontSize: "10px",
+        // }),
         space: {},
       })
       .layout();
@@ -46,8 +46,8 @@ export default class HpBar extends Phaser.GameObjects.Container {
           : -this.bar.width / 4),
       this.player.y + 32
     );
-    const text = `x${this.player?.user?.life + 1 ?? 2}`;
-    this.bar.setText(text);
+    // const text = `x${this.player?.user?.life + 1 ?? 2}`;
+    // this.bar.setText(text);
     this.bar.setValue(this.player.hp, 0, this.player.maxHp);
   }
 

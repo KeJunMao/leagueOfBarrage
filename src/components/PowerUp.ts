@@ -270,4 +270,14 @@ export const facesPowerUp: {
     }
     return powerUp;
   },
+  // 泪目
+  official_103: (user?: User) => {
+    if (user && user?.life <= 0) {
+      return new PowerUp({
+        life: 1,
+        text: "立即复活",
+      });
+    }
+    return new PowerUp({});
+  },
 };
