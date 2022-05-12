@@ -21,6 +21,7 @@
     "@emotion/styled": "^11.8.1",
     "@mui/material": "^5.7.0",
     "@reduxjs/toolkit": "^1.8.1",
+    "animate.css": "^4.1.1",
     "bilibili-live-ws": "^6.2.0",
     "buffer": "^6.0.3",
     "events": "^3.3.0",

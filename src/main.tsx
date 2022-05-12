@@ -5,6 +5,7 @@ import App from "./components/react/App";
 import "./style.css";
 import { store } from "./store";
 import { Provider } from "react-redux";
+import "animate.css";
 
 window.game = new LeagueOfBarrage();
 

@@ -40,10 +40,6 @@ export default () => {
       img: "https://s1.hdslb.com/bfs/live/79b6d0533fc988f2800fc5bb4fe3722c825f746f.png@80w_80h_1e_1c.png",
       content: "大幅提升射速,移速,角度,弹速*N",
     },
-    {
-      name: "任意礼物",
-      content: "复活,命数+N",
-    },
   ];
   const sortUsers = users
     .filter((u) => u.mid > 0)
@@ -96,6 +92,9 @@ export default () => {
       <Box
         sx={{
           display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 1,
         }}
       >
         <Grid container spacing={1}>

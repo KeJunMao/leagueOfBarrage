@@ -15,7 +15,7 @@ const GiftItem: FC<GiftItemProps> = ({ img, name, content }) => {
         {img ? (
           <img
             style={{
-              height: "1em",
+              height: "1.5em",
             }}
             src={img}
             alt={name}

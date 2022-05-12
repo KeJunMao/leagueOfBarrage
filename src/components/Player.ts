@@ -182,6 +182,7 @@ export default class Player extends Phaser.GameObjects.Container {
       this.bullets.maxSize = this.fullFireAmmo;
       this.makeTween();
       this.speak("火力全开！");
+      LeagueOfBarrage.Core.store.dispatch(updateUser());
     } else if (this.hp > 0.5 && this.isFullFire) {
       // 关闭火力全开
       this.isFullFire = false;
@@ -190,6 +191,7 @@ export default class Player extends Phaser.GameObjects.Container {
       this.fullFireAmmo = this.ammo;
       this.bullets.maxSize = this.ammo;
       this.makeTween();
+      LeagueOfBarrage.Core.store.dispatch(updateUser());
     }
   }
 
@@ -254,6 +256,7 @@ export default class Player extends Phaser.GameObjects.Container {
           if (this.user.life > 0) {
             LeagueOfBarrage.Core.makePlayer(this.user);
           }
+          LeagueOfBarrage.Core.store.dispatch(updateUser());
         });
     }
   }
