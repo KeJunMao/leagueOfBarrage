@@ -55,7 +55,7 @@ const UserPanel: FC<UserPanelProps> = ({ user }) => {
             sx={{
               width: 56,
               height: 56,
-              opacity: user.player ? 1 : 0.5,
+              opacity: !user.player?.isDie ? 1 : 0.5,
             }}
             alt={user.name}
             src={
@@ -64,7 +64,7 @@ const UserPanel: FC<UserPanelProps> = ({ user }) => {
           ></Avatar>
         </Badge>
 
-        {user?.player?.isFullFire && (
+        {!user?.player?.isDie && user?.player?.isFullFire && (
           <Box
             className="animate__animated animate__bounce"
             sx={{
@@ -83,11 +83,11 @@ const UserPanel: FC<UserPanelProps> = ({ user }) => {
             🔥
           </Box>
         )}
-        {user.player && (
+        {user.player && !user.player?.isDie && (
           <CircularProgress
             size={60}
             variant="determinate"
-            value={(user?.player.hp / user?.player.maxHp) * 100}
+            value={(user?.player?.hp / user?.player?.maxHp) * 100}
             sx={{
               color: user.team,
               position: "absolute",

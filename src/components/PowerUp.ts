@@ -94,7 +94,7 @@ export default class PowerUp {
       for (let i = 0; i < this.num; i++) {
         const factor =
           (player.fireDelay * this.fireDelay) / Math.log(player.fireDelay);
-        player.fireDelay = factor;
+        player.fireDelay = Math.min(factor, player.fireDelay);
       }
       // 负数直接减
     } else if (this.fireDelay < 0) {
@@ -103,9 +103,11 @@ export default class PowerUp {
   }
 
   applyUp(user: User) {
+    if (!user) return;
     const player = user.player;
 
-    if (player && !player.isDie) {
+    // 存在
+    if (player && !player?.isDie) {
       player.power += this.Power;
       this.applyFireDelay(player);
 
@@ -122,7 +124,7 @@ export default class PowerUp {
       player.maxHp += this.MaxHp;
 
       if (player.hp > player.maxHp) {
-        player.hp = player.maxHp;
+        player.hp = Math.max(player.maxHp, 1);
       }
 
       if (this.Area || this.RotateDuration) {
@@ -136,12 +138,15 @@ export default class PowerUp {
         player.makeTween();
       }
 
+      // 包含命数强化
       if (this.life > 0) {
         user.life += this.life;
         this.life = 0;
         LeagueOfBarrage.Core.store.dispatch(updateUser());
       }
+      // 不存在或者已经阵亡
     } else {
+      // 如果不存在则返回
       if (this.life > 0) {
         user.life += this.life;
         this.life = 0;
@@ -152,6 +157,7 @@ export default class PowerUp {
         }
         LeagueOfBarrage.Core.store.dispatch(updateUser());
       } else {
+        this.life = 0;
         console.log(user.life);
         console.log("阵亡无法强化");
       }
@@ -248,13 +254,14 @@ export const facesPowerUp: {
       powerUp = callGift();
       powerUp.fireDelay = 7;
       powerUp.hp = 0;
+      powerUp.life = 0;
       powerUp.text = "伪·打call超级强化*1";
     }
     return powerUp;
   },
   // 泪目
   official_103: (user?: User) => {
-    if (user && user?.life <= 0 && !user.player) {
+    if (user && user?.life <= 0 && user.player?.isDie) {
       return new PowerUp({
         life: 1,
         text: "立即复活",

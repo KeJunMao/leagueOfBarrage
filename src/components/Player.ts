@@ -19,10 +19,10 @@ export default class Player extends Phaser.GameObjects.Container {
   team: Team;
   bullets: Phaser.GameObjects.Group;
   bulletSpeed: number = 10;
-  speed: number = 10;
+  speed: number = 12;
   maxHp: number = 10;
   hp: number = this.maxHp;
-  power: number = 1;
+  power: number = 1.5;
   fireDelay: number = 2000;
   rotateDuration = 2000;
   // ammo: number = 10;
@@ -157,8 +157,8 @@ export default class Player extends Phaser.GameObjects.Container {
       if (player.isDie && this.user) {
         this.user.killCount += 1;
         this.user.xp += player.level * 2 || 2;
-        LeagueOfBarrage.Core.store.dispatch(updateUser());
       }
+      LeagueOfBarrage.Core.store.dispatch(updateUser());
     }
   }
 
@@ -204,7 +204,7 @@ export default class Player extends Phaser.GameObjects.Container {
     const minFullFireDelay = 200;
     // const minFullFireAmmo = 50;
     const minFullFireRotateDuration = 500;
-    if (this.hp <= 0.5 && !this.isFullFire) {
+    if (this.hp <= 3 && !this.isFullFire) {
       this.isFullFire = true;
       this.fullFireDelay = Math.min(minFullFireDelay, this.fireDelay);
       // this.fullFireAmmo = Math.max(minFullFireAmmo, this.ammo);
@@ -217,7 +217,7 @@ export default class Player extends Phaser.GameObjects.Container {
       this.makeTween();
       this.speak("火力全开！");
       LeagueOfBarrage.Core.store.dispatch(updateUser());
-    } else if (this.hp > 0.5 && this.isFullFire) {
+    } else if (this.hp > 3 && this.isFullFire) {
       // 关闭火力全开
       this.isFullFire = false;
       this.fullFireDelay = this.fireDelay;
@@ -266,11 +266,11 @@ export default class Player extends Phaser.GameObjects.Container {
   }
 
   setDie() {
-    this.hpBar.setDie();
-    this.remove(this.bubble);
-    this.bubble.destroy(true);
-    this.setActive(false);
-    if (this.visible) {
+    if (this.active) {
+      this.hpBar.setDie();
+      this.remove(this.bubble);
+      this.bubble.destroy(true);
+      this.setActive(false);
       this.tank.setOrigin(0.5);
       this.tank.setPosition(0, 0);
       this.weapon.setVisible(false);
@@ -285,7 +285,6 @@ export default class Player extends Phaser.GameObjects.Container {
             LeagueOfBarrage.Core.bluePlayerGroup.remove(this);
           }
           // 重生
-
           if (this.user.life > 0) {
             LeagueOfBarrage.Core.makePlayer(this.user);
           }
