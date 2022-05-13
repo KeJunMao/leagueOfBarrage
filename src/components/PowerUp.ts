@@ -240,16 +240,14 @@ export const facesPowerUp: {
     const rand = Math.random();
     let powerUp = new PowerUp({});
     if (!user) return powerUp;
-    if (rand > 0 && rand <= 0.25) {
-      // 无事发生
-      powerUp.text = "打call无事发生*1";
-    } else if (rand > 0.25 && rand <= 0.5) {
+    if (rand <= 0.5) {
       // 扣属性
       powerUp.hp -= 1;
       powerUp.text = "打call用力过猛";
     } else {
       powerUp = callGift();
-      powerUp.fireDelay = 3;
+      powerUp.fireDelay = 4;
+      powerUp.hp = 0;
       powerUp.text = "伪·打call超级强化*1";
     }
     return powerUp;
