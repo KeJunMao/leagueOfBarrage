@@ -10,7 +10,6 @@ interface IPowerUpProps {
   speed?: number;
   hp?: number;
   maxHp?: number;
-  ammo?: number;
   area?: number;
   life?: number;
   text?: string;
@@ -24,7 +23,6 @@ export default class PowerUp {
   public speed = 0;
   public hp = 0;
   public maxHp = 0;
-  public ammo = 0;
   public area = 0;
   public life = 0;
   public text = "";
@@ -37,7 +35,6 @@ export default class PowerUp {
     speed,
     hp,
     maxHp,
-    ammo,
     area,
     life,
     text,
@@ -85,9 +82,6 @@ export default class PowerUp {
   get BulletSpeed() {
     return this.valueByNum(this.bulletSpeed);
   }
-  get Ammo() {
-    return this.valueByNum(this.ammo);
-  }
   get Area() {
     return this.valueByNum(this.area);
   }
@@ -124,13 +118,6 @@ export default class PowerUp {
       if (player.hp > player.maxHp) {
         player.hp = player.maxHp;
       }
-
-      // player.ammo += this.Ammo;
-      // // 限制弹药库
-      // if (player.ammo > 50) {
-      //   player.ammo = 50;
-      // }
-      // player.bullets.maxSize = player.ammo;
 
       if (this.Area || this.RotateDuration) {
         player.area += this.Area;
@@ -179,7 +166,6 @@ const laTiaoGift = (num: number = 1) => {
     text: `辣条低级强化*${num}`,
     fireDelay: 1.005,
     hp: 5,
-    ammo: 1,
     life: num,
     num,
   });
@@ -191,7 +177,6 @@ const heartGift = (num: number = 1) => {
     fireDelay: 1.0045,
     hp: 10,
     maxHp: 2,
-    ammo: 1,
     life: num,
     num,
   });
@@ -203,7 +188,6 @@ const flowerGift = (num: number = 1) => {
     text: `小花花高级强化*${num}`,
     fireDelay: 1.005,
     speed: 0.05,
-    ammo: 1,
     area: 0.1 / 5,
     life: num,
     bulletSpeed: 0.1 / 5,
@@ -217,17 +201,12 @@ const callGift = (num: number = 1) => {
     text: `打call超级强化*${num}`,
     fireDelay: 1.006,
     speed: 0.1,
-    ammo: 1,
     area: 1,
     life: num,
     bulletSpeed: 0.1,
     num,
   });
 };
-
-// const random = (min: number, max: number) => {
-//   return Math.random() * (max - min) + min;
-// };
 
 export const giftsPowerUp: {
   [key: number | string]: (num?: number) => PowerUp;
@@ -272,7 +251,7 @@ export const facesPowerUp: {
   },
   // 泪目
   official_103: (user?: User) => {
-    if (user && user?.life <= 0) {
+    if (user && user?.life <= 0 && !user.player) {
       return new PowerUp({
         life: 1,
         text: "立即复活",
