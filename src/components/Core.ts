@@ -122,6 +122,18 @@ export default class Core {
     );
 
     this.scoreBar = new ScoreBar(this.scene);
+    const timer = this.scene.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: () => {
+        if (this.isGameStart !== -1) return;
+        this._makeNpc();
+        const { users } = this.store.getState();
+        if (users.value.length >= 6) {
+          timer.paused = true;
+        }
+      },
+    });
   }
 
   onDanmuMsg(data: any) {
@@ -215,6 +227,7 @@ export default class Core {
       this.makePlayer(user);
     } else {
       user.powerUps.push(powerUp);
+      powerUp.applyUp(user);
     }
     if (powerUp.text) {
       user.speak(powerUp.text);
@@ -317,23 +330,23 @@ export default class Core {
         name: "Ke Jun",
       },
     ];
-    if (users.value.length < 6 && this.isGameStart === -1) {
-      const npcUser = npcList[users.value.length];
+    const npcUser = npcList[users.value.length];
+    if (npcUser) {
       const npc = this.makeRandomUser(npcUser.mid, npcUser.name);
       npc.powerUps.push(
         new PowerUp({
-          power: -0.2,
-          maxHp: -1,
+          power: -1,
+          maxHp: -2,
         })
       );
-      this.makePlayer(npc);
+      if (!npc.player) {
+        this.makePlayer(npc);
+      }
     }
   }
 
-  makeNpc = throttle(this._makeNpc, 1000);
-
   update(_time: number = 0) {
-    this.makeNpc();
+    // this.makeNpc();
     this.scoreBar.update();
   }
 }
