@@ -156,13 +156,15 @@ export default class Player extends Phaser.GameObjects.Container {
       player.getDamaged(this.power);
       if (player.isDie && this.user) {
         this.user.killCount += 1;
-        this.user.xp += player.level * 2 || 2;
+        this.user.xp += player.level * 2;
       }
       LeagueOfBarrage.Core.store.dispatch(updateUser());
     }
   }
 
   getDamaged(power: number = 1) {
+    this.checkForLevelUp();
+    this.checkForFullFire();
     if (this.receivingDamage) {
       this.hp -= power;
       if (this.isDie) {
@@ -175,8 +177,6 @@ export default class Player extends Phaser.GameObjects.Container {
 
   onGetDamaged() {
     if (this.receivingDamage) {
-      this.checkForLevelUp();
-      this.checkForFullFire();
       this.tank.setTintFill(0xffffff);
       this.scene.time.addEvent({
         delay: 120,
@@ -309,7 +309,7 @@ export default class Player extends Phaser.GameObjects.Container {
   }
 
   checkForLevelUp() {
-    let factor = 5 + 1.5 * Math.floor(this.level / 20);
+    let factor = 2 + 1.5 * Math.floor(this.level / 20);
     factor = Math.min(factor, 5);
     const requiredToLevelUp = factor * this.level * this.level;
     // console.log(this.user?.xp > 0);
