@@ -105,7 +105,7 @@ export default class PowerUp {
   applyUp(user: User) {
     const player = user.player;
 
-    if (player) {
+    if (player && !player.isDie) {
       player.power += this.Power;
       this.applyFireDelay(player);
 
@@ -145,7 +145,7 @@ export default class PowerUp {
       if (this.life > 0) {
         user.life += this.life;
         this.life = 0;
-        if (user.life > 0 && !user.player) {
+        if (user.life > 0 && user.player?.isDie) {
           console.log("礼物复活");
           LeagueOfBarrage.Core.makePlayer(user);
           this.applyUp(user);

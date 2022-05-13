@@ -153,7 +153,7 @@ export default class Core {
         hasUser?.speak(danmu.text);
       }
       // 金手指
-      // this.makeGift(hasUser, danmu.text);
+      this.makeGift(hasUser, danmu.text);
     }
   }
 
@@ -177,19 +177,21 @@ export default class Core {
   }
 
   makeRandomUser(mid: number, name: string) {
+    let user = User.getUserByMid(mid);
     let team = Math.random() > 0.5 ? Team.Red : Team.Blue;
     if (
-      this.bluePlayerGroup.children.size > this.redPlayerGroup.children.size
+      this.bluePlayerGroup?.children.size > this.redPlayerGroup?.children.size
     ) {
       team = Team.Red;
     } else if (
-      this.bluePlayerGroup.children.size < this.redPlayerGroup.children.size
+      this.bluePlayerGroup?.children.size < this.redPlayerGroup?.children.size
     ) {
       team = Team.Blue;
     }
-    const user = new User(mid, team, name);
-    // this.users.push(user);
-    this.store.dispatch(addUser(user));
+    if (!user) {
+      user = new User(mid, team, name);
+      this.store.dispatch(addUser(user));
+    }
     return user;
   }
 
@@ -209,11 +211,11 @@ export default class Core {
     // 判断用户是否存在，不存在则创建
     if (!user) {
       user = this.makeRandomUser(gift.mid, gift.uname);
+      user.powerUps.push(powerUp);
       this.makePlayer(user);
+    } else {
+      user.powerUps.push(powerUp);
     }
-    // 如果有强化项目，应用
-    user.powerUps.push(powerUp);
-    powerUp.applyUp(user);
     if (powerUp.text) {
       user.speak(powerUp.text);
       this.toast.showMessage(`${user.name}使用了${powerUp.text}`);

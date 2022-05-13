@@ -270,7 +270,6 @@ export default class Player extends Phaser.GameObjects.Container {
     this.remove(this.bubble);
     this.bubble.destroy(true);
     this.setActive(false);
-    this.user.player = undefined;
     if (this.visible) {
       this.tank.setOrigin(0.5);
       this.tank.setPosition(0, 0);
@@ -300,7 +299,7 @@ export default class Player extends Phaser.GameObjects.Container {
     const powerUp = new PowerUp({
       hp: this.maxHp,
       maxHp: 1 * this.level,
-      fireDelay: -200 * this.level,
+      fireDelay: -20 * this.level,
       power: 0.1 * this.level,
       num: 1,
     });
