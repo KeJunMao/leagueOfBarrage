@@ -90,9 +90,15 @@ export default class PowerUp {
   }
 
   applyFireDelay(player: Player) {
-    for (let i = 0; i < this.num; i++) {
-      const factor = Math.max(this.fireDelay ** player.fireDelay / 1, 1);
-      player.fireDelay -= factor;
+    if (this.fireDelay > 0) {
+      for (let i = 0; i < this.num; i++) {
+        const factor =
+          (player.fireDelay * this.fireDelay) / Math.log(player.fireDelay);
+        player.fireDelay = factor;
+      }
+      // 负数直接减
+    } else if (this.fireDelay < 0) {
+      player.fireDelay += this.fireDelay * this.num;
     }
   }
 
@@ -102,11 +108,12 @@ export default class PowerUp {
     if (player) {
       player.power += this.Power;
       this.applyFireDelay(player);
+
       // player.fireDelay -= this.FireDelay;
       // // 限制射速
-      // if (player.fireDelay < 100) {
-      //   player.fireDelay = 100;
-      // }
+      if (player.fireDelay < 50) {
+        player.fireDelay = 50;
+      }
       player.speed += this.Speed;
 
       player.bulletSpeed += this.BulletSpeed;
@@ -163,29 +170,27 @@ export default class PowerUp {
 const laTiaoGift = (num: number = 1) => {
   return new PowerUp({
     text: `辣条低级强化*${num}`,
-    fireDelay: 1.005,
+    fireDelay: 3,
     hp: 5,
     life: num,
     num,
   });
 };
 // 小心心 提升射速 恢复血量 提升血量上限
-const heartGift = (num: number = 1) => {
-  return new PowerUp({
-    text: `小心心中级强化*${num}`,
-    fireDelay: 1.0045,
-    hp: 10,
-    maxHp: 2,
-    life: num,
-    num,
-  });
-};
+// const heartGift = (num: number = 1) => {
+//   return new PowerUp({
+//     text: `小心心中级强化*${num}`,
+//     fireDelay: 200,
+//     life: num,
+//     num,
+//   });
+// };
 
 // 小花花 提升射速、移动速度、角度、子弹速度
 const flowerGift = (num: number = 1) => {
   return new PowerUp({
     text: `小花花高级强化*${num}`,
-    fireDelay: 1.005,
+    fireDelay: 1.5,
     speed: 0.05,
     area: 0.1 / 5,
     life: num,
@@ -198,8 +203,8 @@ const flowerGift = (num: number = 1) => {
 const callGift = (num: number = 1) => {
   return new PowerUp({
     text: `打call超级强化*${num}`,
-    fireDelay: 1.006,
-    speed: 0.1,
+    fireDelay: 0.76,
+    speed: 1,
     area: 1,
     life: num,
     bulletSpeed: 0.1,
@@ -216,8 +221,8 @@ export const giftsPowerUp: {
   31037: callGift,
   // 小花花
   31036: flowerGift,
-  // 小心心
-  30607: heartGift,
+  // // 小心心
+  // 30607: heartGift,
 };
 
 export const facesPowerUp: {

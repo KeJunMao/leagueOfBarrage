@@ -23,7 +23,7 @@ export default class Player extends Phaser.GameObjects.Container {
   maxHp: number = 10;
   hp: number = this.maxHp;
   power: number = 1;
-  fireDelay: number = 1000;
+  fireDelay: number = 2000;
   rotateDuration = 2000;
   // ammo: number = 10;
   fullFireDelay = this.fireDelay;
@@ -175,6 +175,8 @@ export default class Player extends Phaser.GameObjects.Container {
 
   onGetDamaged() {
     if (this.receivingDamage) {
+      this.checkForLevelUp();
+      this.checkForFullFire();
       this.tank.setTintFill(0xffffff);
       this.scene.time.addEvent({
         delay: 120,
@@ -298,7 +300,7 @@ export default class Player extends Phaser.GameObjects.Container {
     const powerUp = new PowerUp({
       hp: this.maxHp,
       maxHp: 1 * this.level,
-      fireDelay: 1.004,
+      fireDelay: -200 * this.level,
       power: 0.1 * this.level,
       num: 1,
     });
@@ -326,8 +328,6 @@ export default class Player extends Phaser.GameObjects.Container {
       return;
     }
     scene.physics.moveTo(this, this.target.x, this.target.y, this.speed);
-    this.checkForLevelUp();
-    this.checkForFullFire();
     if (
       this.x > 0 &&
       this.x < this.scene.renderer.width &&
