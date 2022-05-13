@@ -20,9 +20,9 @@ export default class Player extends Phaser.GameObjects.Container {
   bullets: Phaser.GameObjects.Group;
   bulletSpeed: number = 10;
   speed: number = 10;
-  maxHp: number = 3;
+  maxHp: number = 10;
   hp: number = this.maxHp;
-  power: number = 0.5;
+  power: number = 1;
   fireDelay: number = 1000;
   rotateDuration = 2000;
   // ammo: number = 10;
@@ -41,6 +41,7 @@ export default class Player extends Phaser.GameObjects.Container {
   isFullFire: boolean = false;
   tankWidth = 48;
   tankHeight = 48;
+  receivingDamage: boolean = true;
   constructor(scene: Phaser.Scene, x: number, y: number, user: User) {
     super(scene, x, y);
 
@@ -152,12 +153,38 @@ export default class Player extends Phaser.GameObjects.Container {
   onBulletOverlapsPlayer(bullet: Bullet, player: Player) {
     bullet.setDie();
     if (player.x > 16 && player.x < this.scene.renderer.width - 16) {
-      player.hp = player.hp - this.power;
+      player.getDamaged(this.power);
       if (player.isDie && this.user) {
         this.user.killCount += 1;
         this.user.xp += player.level * 2 || 2;
         LeagueOfBarrage.Core.store.dispatch(updateUser());
       }
+    }
+  }
+
+  getDamaged(power: number = 1) {
+    if (this.receivingDamage) {
+      this.hp -= power;
+      if (this.isDie) {
+        this.setDie();
+      } else {
+        this.onGetDamaged();
+      }
+    }
+  }
+
+  onGetDamaged() {
+    if (this.receivingDamage) {
+      this.tank.setTintFill(0xffffff);
+      this.scene.time.addEvent({
+        delay: 120,
+        loop: false,
+        callback: () => {
+          this?.tank?.clearTint();
+          this.receivingDamage = true;
+        },
+      });
+      this.receivingDamage = false;
     }
   }
 
@@ -300,10 +327,6 @@ export default class Player extends Phaser.GameObjects.Container {
     }
     scene.physics.moveTo(this, this.target.x, this.target.y, this.speed);
     this.checkForLevelUp();
-    if (this.isDie) {
-      this.setDie();
-      return;
-    }
     this.checkForFullFire();
     if (
       this.x > 0 &&
