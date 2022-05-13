@@ -47,7 +47,6 @@ export default class PowerUp {
     this.speed = speed ?? 0;
     this.hp = hp ?? 0;
     this.maxHp = maxHp ?? 0;
-    this.ammo = ammo ?? 0;
     this.area = area ?? 0;
     this.text = text ?? "";
     this.bulletSpeed = bulletSpeed ?? 0;
