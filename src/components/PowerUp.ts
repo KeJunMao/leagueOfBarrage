@@ -249,6 +249,7 @@ export const facesPowerUp: {
       powerUp.text = "打call用力过猛";
     } else {
       powerUp = callGift();
+      powerUp.fireDelay = 3;
       powerUp.text = "伪·打call超级强化*1";
     }
     return powerUp;
